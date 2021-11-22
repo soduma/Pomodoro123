@@ -21,6 +21,7 @@ class ViewController: UIViewController {
     @IBOutlet var datePicker: UIDatePicker!
     @IBOutlet var cancelButton: UIButton!
     @IBOutlet var toggleButton: UIButton!
+    @IBOutlet var imageView: UIImageView!
     
     var duration = 60
     var timerStatus: TimerStatus = .end
@@ -56,8 +57,11 @@ class ViewController: UIViewController {
             timer?.resume()
         case .end:
             timerStatus = .start
-            setTimerInfoViewVisible(isHidden: false)
-            datePicker.isHidden = true
+            UIView.animate(withDuration: 0.5, animations: {
+                self.timerLabel.alpha = 1
+                self.progressView.alpha = 1
+                self.datePicker.alpha = 0
+            })
             toggleButton.isSelected = true
             cancelButton.isEnabled = true
             currentSeconds = duration
@@ -87,6 +91,12 @@ class ViewController: UIViewController {
                 let seconds = (self.currentSeconds % 3600) % 60
                 self.timerLabel.text = String(format: "%02d:%02d:%02d", hour, minute, seconds)
                 self.progressView.progress = Float(self.currentSeconds) / Float(self.duration)
+                UIView.animate(withDuration: 0.5, delay: 0, animations: {
+                    self.imageView.transform = CGAffineTransform(rotationAngle: .pi)
+                })
+                UIView.animate(withDuration: 0.5, delay: 0.5, animations: {
+                    self.imageView.transform = CGAffineTransform(rotationAngle: .pi * 2)
+                })
                 debugPrint(self.progressView.progress)
                 
                 if self.currentSeconds <= 0 {
@@ -104,8 +114,12 @@ class ViewController: UIViewController {
         }
         timerStatus = .end
         cancelButton.isEnabled = false
-        setTimerInfoViewVisible(isHidden: true)
-        datePicker.isHidden = false
+        UIView.animate(withDuration: 0.5, animations: {
+            self.timerLabel.alpha = 0
+            self.progressView.alpha = 0
+            self.datePicker.alpha = 1
+            self.imageView.transform = .identity
+        })
         toggleButton.isSelected = false
         timer?.cancel()
         timer = nil
